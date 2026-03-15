@@ -1,66 +1,82 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { MessageCircle, X, Send, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ABOUT_DATA = {
-  name: "Gaurav Waghmare",
-  role: "Full Stack Developer",
-  location: "Nagpur, India",
-  email: "gauravwaghmare95032@gmail.com",
-  education: "3rd-year B.Tech CSE student",
-  skills: "React, Node.js, TypeScript, Python, MongoDB, Socket.io, Next.js, React Native, AI/ML",
-  specialization: "MERN Stack & AI-powered Web Apps",
-  achievements: "Google Gemini Student Ambassador, Hackathon Development Lead & Co-organiser",
-  github: "https://github.com/GauravWaghmare23",
-  projects: "CodeJarvis (AI coding agent), HypeChat (real-time chat), Uber Clone (ride-hailing), AgriTrace (supply chain)",
-  leetcode: "82 problems solved (65 Easy, 15 Medium, 2 Hard)",
-  githubStats: "426+ contributions, longest streak of 11 days",
-  about: "A full-stack developer who believes the web has become too sanitized and brings personality back to code. Currently building an AI-powered Browser IDE.",
-};
+const genAI = new GoogleGenerativeAI("AIzaSyAkbDc05RCzipKc-HzW1ldr1RvvXFzbypM");
+
+const SYSTEM_PROMPT = `You are Gaurav Waghmare's AI portfolio assistant. Answer questions about him based on this info:
+
+- Name: Gaurav Waghmare
+- Role: Full Stack Developer
+- Location: Nagpur, India
+- Email: gauravwaghmare95032@gmail.com
+- Education: 3rd-year B.Tech CSE student
+- Skills: React, Node.js, TypeScript, Python, MongoDB, Socket.io, Next.js, React Native, AI/ML
+- Specialization: MERN Stack & AI-powered Web Apps
+- Achievements: Google Gemini Student Ambassador, Hackathon Development Lead & Co-organiser
+- GitHub: https://github.com/GauravWaghmare23 (426+ contributions, longest streak 11 days)
+- LeetCode: 82 problems solved (65 Easy, 15 Medium, 2 Hard)
+- Projects:
+  1. CodeJarvis - AI-powered coding agent with multi-team collaboration (React, Node.js, AI/ML, TypeScript, Socket.io)
+  2. HypeChat - Real-time chat app for mobile and web (React Native, Node.js, Socket.io, MongoDB)
+  3. Uber Clone - Full-stack ride-hailing app with real-time tracking (React, Node.js, MongoDB, Socket.io)
+  4. AgriTrace - Agricultural supply-chain platform with QR traceability (Next.js, TypeScript, MongoDB, REST API)
+- About: A full-stack developer who believes the web has become too sanitized and brings personality back to code. Currently building an AI-powered Browser IDE.
+- Status: Available for hire
+
+Keep answers concise, friendly, and professional. If asked something unrelated to Gaurav, politely redirect.`;
 
 type Message = { role: "user" | "assistant"; content: string };
-
-function getResponse(input: string): string {
-  const q = input.toLowerCase();
-
-  if (q.match(/hi|hello|hey|sup/)) return `Hey! 👋 I'm Gaurav's AI assistant. Ask me anything about his skills, projects, or experience!`;
-  if (q.match(/name|who/)) return `He's **${ABOUT_DATA.name}** — a ${ABOUT_DATA.role} based in ${ABOUT_DATA.location}. ${ABOUT_DATA.about}`;
-  if (q.match(/skill|tech|stack|know/)) return `**Tech Stack:** ${ABOUT_DATA.skills}\n\n**Specialization:** ${ABOUT_DATA.specialization}`;
-  if (q.match(/project|work|build|made/)) return `**Projects:**\n${ABOUT_DATA.projects.split(", ").map(p => `• ${p}`).join("\n")}\n\nCheck out his GitHub: ${ABOUT_DATA.github}`;
-  if (q.match(/education|study|college|degree/)) return `📚 ${ABOUT_DATA.education}`;
-  if (q.match(/contact|email|hire|reach/)) return `📧 Email: ${ABOUT_DATA.email}\n\nHe's currently **available** for opportunities!`;
-  if (q.match(/leetcode|dsa|coding|problem/)) return `**LeetCode Stats:** ${ABOUT_DATA.leetcode}`;
-  if (q.match(/github|contrib|commit/)) return `**GitHub:** ${ABOUT_DATA.githubStats}\n\n🔗 ${ABOUT_DATA.github}`;
-  if (q.match(/achieve|award|ambassador/)) return `🏆 ${ABOUT_DATA.achievements}`;
-  if (q.match(/location|where|city|from/)) return `📍 Based in **${ABOUT_DATA.location}**`;
-  if (q.match(/resume|cv/)) return `You can download his resume using the **Download Resume** button in the hero section!`;
-
-  return `I can tell you about Gaurav's **skills**, **projects**, **education**, **LeetCode stats**, **GitHub contributions**, or **contact info**. What would you like to know?`;
-}
 
 const AIChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hey! 👋 I'm Gaurav's AI assistant. Ask me about his skills, projects, experience, or anything else!" },
+    { role: "assistant", content: "Hey! 👋 I'm Gaurav's AI assistant. Ask me anything about his skills, projects, experience, or anything else!" },
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const send = () => {
-    if (!input.trim()) return;
+  const send = async () => {
+    if (!input.trim() || isLoading) return;
     const userMsg: Message = { role: "user", content: input.trim() };
-    const reply: Message = { role: "assistant", content: getResponse(input.trim()) };
-    setMessages((prev) => [...prev, userMsg, reply]);
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setIsLoading(true);
+
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const history = messages.map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
+
+      const chat = model.startChat({
+        history: [
+          { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+          { role: "model", parts: [{ text: "Understood! I'm ready to answer questions about Gaurav." }] },
+          ...history,
+        ],
+      });
+
+      const result = await chat.sendMessage(userMsg.content);
+      const reply = result.response.text();
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    } catch (error) {
+      console.error("AI Error:", error);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, something went wrong. Please try again!" }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <>
-      {/* Toggle button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground shadow-[4px_4px_0px_hsl(var(--foreground))] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
@@ -69,7 +85,6 @@ const AIChatWidget = () => {
         {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </motion.button>
 
-      {/* Chat panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -79,13 +94,11 @@ const AIChatWidget = () => {
             transition={{ duration: 0.2 }}
             className="fixed bottom-24 right-6 z-50 w-[calc(100vw-3rem)] sm:w-96 h-[28rem] border-2 border-foreground bg-background flex flex-col shadow-[6px_6px_0px_hsl(var(--foreground))]"
           >
-            {/* Header */}
             <div className="bg-foreground text-background px-4 py-3 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse-dot" />
               <span className="font-mono text-xs font-bold">GAURAV.AI — ASK ME ANYTHING</span>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -100,10 +113,16 @@ const AIChatWidget = () => {
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-muted text-foreground border border-border px-3 py-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  </div>
+                </div>
+              )}
               <div ref={bottomRef} />
             </div>
 
-            {/* Input */}
             <div className="border-t border-border p-2 flex gap-2">
               <input
                 value={input}
@@ -111,10 +130,12 @@ const AIChatWidget = () => {
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder="Ask about skills, projects..."
                 className="flex-1 bg-muted px-3 py-2 font-mono text-xs border border-border focus:outline-none focus:border-primary"
+                disabled={isLoading}
               />
               <button
                 onClick={send}
-                className="bg-foreground text-background p-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+                disabled={isLoading}
+                className="bg-foreground text-background p-2 hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
               </button>
