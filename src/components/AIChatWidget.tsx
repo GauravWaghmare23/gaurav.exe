@@ -3,7 +3,8 @@ import { MessageCircle, X, Send, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI("AIzaSyAkbDc05RCzipKc-HzW1ldr1RvvXFzbypM");
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 const SYSTEM_PROMPT = `You are Gaurav Waghmare's AI portfolio assistant. Answer questions about him based on this info:
 
@@ -49,27 +50,31 @@ const AIChatWidget = () => {
     setInput("");
     setIsLoading(true);
 
+    if (!genAI) {
+      setMessages((prev) => [...prev, { role: "assistant", content: "Chat is currently unavailable. Please check the configuration." }]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        systemInstruction: SYSTEM_PROMPT 
+      });
+      
       const history = messages.map((m) => ({
         role: m.role === "assistant" ? "model" : "user",
         parts: [{ text: m.content }],
       }));
 
-      const chat = model.startChat({
-        history: [
-          { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-          { role: "model", parts: [{ text: "Understood! I'm ready to answer questions about Gaurav." }] },
-          ...history,
-        ],
-      });
+      const chat = model.startChat({ history });
 
       const result = await chat.sendMessage(userMsg.content);
       const reply = result.response.text();
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, something went wrong. Please try again!" }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I'm having trouble connecting right now. Please try again later!" }]);
     } finally {
       setIsLoading(false);
     }
