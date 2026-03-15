@@ -6,24 +6,28 @@ import AnimatedSection, { staggerContainer, staggerItem } from "./AnimatedSectio
 const projects = [
   {
     title: "CODEJARVIS",
+    slug: "codejarvis",
     desc: "An AI-powered coding agent with multi-team collaboration, intelligent code suggestions, and agentic workflows for automating dev tasks.",
     tech: ["React", "Node.js", "AI/ML", "TypeScript", "Socket.io"],
     link: "https://github.com/GauravWaghmare23/CodeJarvis",
   },
   {
     title: "HYPECHAT",
+    slug: "hypechat",
     desc: "A real-time chat application for mobile and web using Socket.io with instant messaging, typing indicators, and cross-platform support.",
     tech: ["React Native", "Node.js", "Socket.io", "MongoDB"],
     link: "https://github.com/GauravWaghmare23/HypeChat",
   },
   {
     title: "UBER CLONE",
+    slug: "uber-clone",
     desc: "Full-stack Uber-style ride-hailing app with real-time tracking, fare calculation, JWT auth, and payment integration.",
     tech: ["React", "Node.js", "MongoDB", "Socket.io"],
     link: "https://github.com/GauravWaghmare23/UBER",
   },
   {
     title: "AGRITRACE",
+    slug: "agritrace",
     desc: "Agricultural supply-chain platform with role-based dashboards, QR-based crop traceability, and farm-to-consumer tracking.",
     tech: ["Next.js", "TypeScript", "MongoDB", "REST API"],
     link: "https://github.com/GauravWaghmare23/Crop-Tracking-App",
@@ -31,6 +35,8 @@ const projects = [
 ];
 
 const ProjectsSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section id="projects" className="bg-primary py-16 sm:py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
@@ -52,7 +58,8 @@ const ProjectsSection = () => {
               key={p.title}
               variants={staggerItem}
               whileHover={{ y: -4 }}
-              className="border-2 border-foreground bg-card p-4 sm:p-6 transition-transform"
+              onClick={() => navigate(`/project/${p.slug}`)}
+              className="border-2 border-foreground bg-card p-4 sm:p-6 transition-transform cursor-pointer"
             >
               <div className="flex items-start justify-between mb-3">
                 <h3 className="font-sans text-xl sm:text-2xl font-bold text-card-foreground">{p.title}</h3>
@@ -60,6 +67,7 @@ const ProjectsSection = () => {
                   href={p.link}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
                   className="bg-accent text-accent-foreground p-2 hover:bg-foreground hover:text-background transition-colors shrink-0"
                 >
                   <ExternalLink className="w-4 h-4" />
