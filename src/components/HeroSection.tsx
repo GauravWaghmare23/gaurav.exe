@@ -75,6 +75,14 @@ const HeroSection = () => {
         >
           ✉ CONTACT ME
         </a>
+        <a
+          href="/resume.pdf"
+          download
+          className="bg-accent text-accent-foreground font-mono text-xs font-bold px-6 py-3 border-2 border-foreground hover:bg-foreground hover:text-background transition-colors text-center flex items-center justify-center gap-2"
+        >
+          <Download className="w-3.5 h-3.5" />
+          DOWNLOAD RESUME
+        </a>
       </motion.div>
 
       {/* Scroll indicator */}
