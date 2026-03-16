@@ -32,21 +32,21 @@ const StatsSection = () => {
                     <p className="font-mono font-bold text-sm sm:text-base">GauravWaghmare23</p>
                     <p className="font-mono text-[9px] sm:text-[10px] text-muted-foreground">FULL STACK DEV</p>
                   </div>
-                  <span className="font-mono text-xl sm:text-2xl font-bold text-terminal-green">426+</span>
+                  <span className="font-mono text-xl sm:text-2xl font-bold text-terminal-green">364+</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <div className="border border-terminal-border p-2 sm:p-3">
                     <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground">CONTRIBUTIONS</p>
-                    <p className="font-mono text-xl sm:text-2xl font-bold">426</p>
+                    <p className="font-mono text-xl sm:text-2xl font-bold">364</p>
                   </div>
                   <div className="border border-terminal-border p-2 sm:p-3">
                     <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground">CURRENT STREAK</p>
-                    <p className="font-mono text-xl sm:text-2xl font-bold">2</p>
+                    <p className="font-mono text-xl sm:text-2xl font-bold">22</p>
                   </div>
                   <div className="border border-terminal-border p-2 sm:p-3">
                     <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground">LONGEST STREAK</p>
-                    <p className="font-mono text-xl sm:text-2xl font-bold">11</p>
+                    <p className="font-mono text-xl sm:text-2xl font-bold">21</p>
                   </div>
                   <div className="border border-terminal-border p-2 sm:p-3">
                     <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground">JOINED</p>
@@ -87,21 +87,21 @@ const StatsSection = () => {
 
                 <div className="flex items-center gap-4 sm:gap-8 mb-4">
                   <div className="text-center">
-                    <p className="font-mono text-3xl sm:text-4xl font-bold text-primary">82</p>
+                    <p className="font-mono text-3xl sm:text-4xl font-bold text-primary">105</p>
                     <p className="font-mono text-[9px] sm:text-[10px] text-muted-foreground">SOLVED</p>
                   </div>
                   <div className="space-y-2 flex-1">
                     <div className="flex justify-between font-mono text-[10px] sm:text-xs">
                       <span className="text-terminal-green">Easy</span>
-                      <span>65 / 929</span>
+                      <span>72 / 929</span>
                     </div>
                     <div className="flex justify-between font-mono text-[10px] sm:text-xs">
                       <span className="text-primary">Medium</span>
-                      <span>15 / 2018</span>
+                      <span>28 / 2018</span>
                     </div>
                     <div className="flex justify-between font-mono text-[10px] sm:text-xs">
                       <span className="text-destructive">Hard</span>
-                      <span>2 / 912</span>
+                      <span>5 / 912</span>
                     </div>
                   </div>
                 </div>
