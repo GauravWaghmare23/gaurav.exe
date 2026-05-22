@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
   { label: "ABOUT", id: "about" },
   { label: "EXPERIENCE", id: "experience" },
   { label: "SKILLS", id: "tech-stack" },
   { label: "PROJECTS", id: "projects" },
+  { label: "HACK", id: "hack" },
   { label: "BLOGS", id: "blogs" },
   { label: "STATS", id: "stats" },
   { label: "CONTACT", id: "contact" },
@@ -54,6 +56,7 @@ const Navbar = () => {
               /{item.label}
             </button>
           ))}
+          <div className="ml-2"><ThemeToggle /></div>
           <a
             href="mailto:gauravwaghmare95032@gmail.com"
             className="ml-2 border-2 border-foreground bg-primary text-primary-foreground font-mono text-xs font-bold px-4 py-1.5 hover:bg-foreground hover:text-background transition-colors"
@@ -63,13 +66,16 @@ const Navbar = () => {
         </div>
 
         {/* Mobile hamburger */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden p-2 border border-foreground"
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="lg:hidden flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 border border-foreground"
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
